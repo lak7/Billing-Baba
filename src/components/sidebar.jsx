@@ -5,6 +5,8 @@ export default function Sidebar({ part, subpart, data = null }) {
   const Navigate = useNavigate();
   // alert(part);
 
+  const logoUrl = data.Logo;
+
   const [isDropdownOpen, setIsDropdownOpen] = useState("");
   useEffect(() => {
     if (part === "sale") {
@@ -15,7 +17,7 @@ export default function Sidebar({ part, subpart, data = null }) {
   return (
     <div id="sidebar" className="flex">
       <div className="top" onClick={() => Navigate("/profile")}>
-        <img src="./assets/home/user_img.png" alt="" />
+        <img src={logoUrl ? logoUrl : "./assets/home/user_img.png"} alt="" />
         <div className="content">
           {data ? <h1>{data.BusinessName}</h1> : <h1>_Business_Name</h1>}
           {data ? <h2>{data.name}</h2> : <h1>_User_Name</h1>}
@@ -117,11 +119,11 @@ export default function Sidebar({ part, subpart, data = null }) {
                 </li>
               </Link>
               {data.settings?.estmateQ && (
-              <Link to="/estimation">
-                <li className={subpart === "estimation" ? "selected" : ""}>
-                  Estimation
-                </li>
-              </Link>
+                <Link to="/estimation">
+                  <li className={subpart === "estimation" ? "selected" : ""}>
+                    Estimation
+                  </li>
+                </Link>
               )}
               <Link to="/payment-in">
                 <li className={subpart === "payment-in" ? "selected" : ""}>
@@ -129,18 +131,20 @@ export default function Sidebar({ part, subpart, data = null }) {
                 </li>
               </Link>
               {data.settings?.saleOrder && (
-              <Link to="/sales-order">
-                <li className={subpart === "sales-order" ? "selected" : ""}>
-                  Sales Order
-                </li>
-              </Link>
+                <Link to="/sales-order">
+                  <li className={subpart === "sales-order" ? "selected" : ""}>
+                    Sales Order
+                  </li>
+                </Link>
               )}
               {data.settings?.chalan && (
-              <Link to="/delivery-chalan">
-                <li className={subpart === "delivery-chalan" ? "selected" : ""}>
-                  Delievery Chalan
-                </li>
-              </Link>
+                <Link to="/delivery-chalan">
+                  <li
+                    className={subpart === "delivery-chalan" ? "selected" : ""}
+                  >
+                    Delievery Chalan
+                  </li>
+                </Link>
               )}
               <Link to="/sales-return">
                 <li className={subpart === "sales-return" ? "selected" : ""}>
@@ -154,7 +158,7 @@ export default function Sidebar({ part, subpart, data = null }) {
               className={part === "purchase" ? "selected" : ""}
               onClick={() =>
                 setIsDropdownOpen(
-                  isDropdownOpen === "purchase" ? "" : "purchase",
+                  isDropdownOpen === "purchase" ? "" : "purchase"
                 )
               }
             >
@@ -388,7 +392,9 @@ export default function Sidebar({ part, subpart, data = null }) {
             <img src="/assets/Logo1.png" className="w-auto h-10" />
             <span className="font-bold font-sans ">Billing Baba</span>
           </h1>
-          <h2 className="text-md font-bold font-sans mb-2">Your trial ends in 5 days</h2>
+          <h2 className="text-md font-bold font-sans mb-2">
+            Your trial ends in 5 days
+          </h2>
           <button
             onClick={() => Navigate("/check-plan")}
             className="w-full border border-gray-100 p-2 hover:bg-gray-200 hover:text-black text-white rounded-md"

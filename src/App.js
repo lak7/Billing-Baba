@@ -91,44 +91,61 @@ function App() {
 
   const updateData = () => {
     setloading2(true);
-    alert("Updating Data");
-    localStorage.setItem("data", data);
+    localStorage.setItem("data", JSON.stringify(data));
     if (uid) {
       try {
-        let url = dev_url + "editData";
+        // Make sure URL has the correct format with a slash
+        let url = dev_url.endsWith("/")
+          ? dev_url + "editData"
+          : dev_url + "/editData";
+        console.log("Sending data to:", url);
+
         fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: uid, // Modify this if necessary
+            Authorization: uid,
           },
           body: JSON.stringify(data),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            alert("Data is updated in backend");
-            console.log("updated");
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Server responded with status: ${response.status}`
+              );
+            }
+            return response.json();
+          })
+          .then((responseData) => {
+            console.log("Update successful:", responseData);
             setloading2(false);
             localStorage.setItem("edited", false);
           })
           .catch((error) => {
-            setloading2(false);
             console.error("Error in updating:", error);
+            setloading2(false);
+            // Store locally even if server update fails
+            localStorage.setItem("edited", true);
           });
       } catch (e) {
-        alert("Unable to connect to server");
+        console.error("Connection error:", e);
         setloading2(false);
         localStorage.setItem("edited", true);
-        alert("unable to save to remote server");
       }
     } else {
+      setloading2(false);
       console.error("Error Logging in, please login again");
     }
   };
+
+  // Debounce the updateData function to prevent rapid consecutive calls
   useEffect(() => {
-    alert("Data changed");
-    updateData();
-    console.log("Data is: ", data);
+    const timer = setTimeout(() => {
+      updateData();
+      console.log("Data updated:", data);
+    }, 1000); // 1-second delay before updating
+
+    return () => clearTimeout(timer);
   }, [data, change]);
 
   const fetchData = () => {
