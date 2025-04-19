@@ -4,6 +4,7 @@ import dev_url from "../url";
 const ImageUploader = ({ onClose, onUpload }) => {
   const [dragging, setDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -28,25 +29,45 @@ const ImageUploader = ({ onClose, onUpload }) => {
 
   const handleUpload = async () => {
     if (!selectedFile) return;
+
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("file", selectedFile);
 
+    // Add unique timestamp to avoid caching
+    const timestamp = new Date().getTime();
+
     try {
-      const response = await fetch(dev_url + "/upload_image", {
+      // Add timestamp to URL to prevent caching
+      const uploadUrl = `${dev_url}/upload_image?t=${timestamp}`;
+
+      const response = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
+        headers: {
+          // Don't add Content-Type header as browser will set it with boundary for FormData
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
       });
 
       const result = await response.json();
+
       if (result.url) {
-        onUpload(result.url); // Send URL to parent component
+        // Add timestamp to URL to ensure uniqueness
+        const uniqueUrl = `${result.url}?t=${timestamp}`;
+        console.log("Image upload success, URL:", uniqueUrl);
+        onUpload(uniqueUrl); // Send URL to parent component
         onClose(); // Close popup after upload
       } else {
-        alert("Upload failed");
+        alert("Upload failed: " + (result.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert("Error uploading file");
+      alert("Error uploading file: " + error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -56,6 +77,7 @@ const ImageUploader = ({ onClose, onUpload }) => {
         <button
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
           onClick={onClose}
+          disabled={isUploading}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +113,8 @@ const ImageUploader = ({ onClose, onUpload }) => {
             type="file"
             onChange={handleFileChange}
             className="mt-4 px-4 py-2 border border-gray-300 rounded-lg text-sm cursor-pointer"
+            accept="image/*"
+            disabled={isUploading}
           />
         </div>
         {selectedFile && (
@@ -101,9 +125,9 @@ const ImageUploader = ({ onClose, onUpload }) => {
         <button
           onClick={handleUpload}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg w-full disabled:bg-indigo-300 transition-all"
-          disabled={!selectedFile}
+          disabled={!selectedFile || isUploading}
         >
-          Upload
+          {isUploading ? "Uploading..." : "Upload"}
         </button>
       </div>
     </div>

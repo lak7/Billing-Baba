@@ -79,7 +79,7 @@ function App() {
   const [change, setChange] = useState(false);
   const [loading2, setloading2] = useState(false);
   const [Error, setError] = useState(true);
-  
+
   const [loading, setloading] = useState(true);
   useEffect(() => {
     // console.log(data);
@@ -91,9 +91,9 @@ function App() {
 
   const updateData = () => {
     setloading2(true);
+    alert("Updating Data");
     localStorage.setItem("data", data);
-    if(uid){
-
+    if (uid) {
       try {
         let url = dev_url + "editData";
         fetch(url, {
@@ -106,31 +106,33 @@ function App() {
         })
           .then((response) => response.json())
           .then((data) => {
+            alert("Data is updated in backend");
             console.log("updated");
             setloading2(false);
             localStorage.setItem("edited", false);
           })
           .catch((error) => {
             setloading2(false);
-            console.error("Error:", error);
+            console.error("Error in updating:", error);
           });
       } catch (e) {
+        alert("Unable to connect to server");
         setloading2(false);
         localStorage.setItem("edited", true);
         alert("unable to save to remote server");
       }
-    }else{
-      console.error("Error Logging in, please login again")
+    } else {
+      console.error("Error Logging in, please login again");
     }
   };
   useEffect(() => {
+    alert("Data changed");
     updateData();
-    console.log(data);
+    console.log("Data is: ", data);
   }, [data, change]);
 
   const fetchData = () => {
-    if(uid){
-
+    if (uid) {
       fetch(dev_url + "/get_user", {
         method: "GET",
         headers: {
@@ -151,122 +153,122 @@ function App() {
           console.error("Error:", error);
           setData({ serverError: true });
         });
-    }else{
-      console.error("Error Logging in, please login again")
+    } else {
+      console.error("Error Logging in, please login again");
     }
   };
 
   if (!uid) {
-    return(
+    return (
       <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </BrowserRouter>
-      {loading2 && (
-        <div className="loading">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-            <circle
-              fill="#FF156D"
-              stroke="#FF156D"
-              strokeWidth="15"
-              r="15"
-              cx="35"
-              cy="100"
-            >
-              <animate
-                attributeName="cx"
-                calcMode="spline"
-                dur="2"
-                values="35;165;165;35;35"
-                keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
-                repeatCount="indefinite"
-                begin="0"
-              ></animate>
-            </circle>
-            <circle
-              fill="#FF156D"
-              stroke="#FF156D"
-              strokeWidth="15"
-              opacity=".8"
-              r="15"
-              cx="35"
-              cy="100"
-            >
-              <animate
-                attributeName="cx"
-                calcMode="spline"
-                dur="2"
-                values="35;165;165;35;35"
-                keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
-                repeatCount="indefinite"
-                begin="0.05"
-              ></animate>
-            </circle>
-            <circle
-              fill="#FF156D"
-              stroke="#FF156D"
-              strokeWidth="15"
-              opacity=".6"
-              r="15"
-              cx="35"
-              cy="100"
-            >
-              <animate
-                attributeName="cx"
-                calcMode="spline"
-                dur="2"
-                values="35;165;165;35;35"
-                keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
-                repeatCount="indefinite"
-                begin=".1"
-              ></animate>
-            </circle>
-            <circle
-              fill="#FF156D"
-              stroke="#FF156D"
-              strokeWidth="15"
-              opacity=".4"
-              r="15"
-              cx="35"
-              cy="100"
-            >
-              <animate
-                attributeName="cx"
-                calcMode="spline"
-                dur="2"
-                values="35;165;165;35;35"
-                keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
-                repeatCount="indefinite"
-                begin=".15"
-              ></animate>
-            </circle>
-            <circle
-              fill="#FF156D"
-              stroke="#FF156D"
-              strokeWidth="15"
-              opacity=".2"
-              r="15"
-              cx="35"
-              cy="100"
-            >
-              <animate
-                attributeName="cx"
-                calcMode="spline"
-                dur="2"
-                values="35;165;165;35;35"
-                keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
-                repeatCount="indefinite"
-                begin=".2"
-              ></animate>
-            </circle>
-          </svg>
-        </div>
-      )}
-    </div>
-    )
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </BrowserRouter>
+        {loading2 && (
+          <div className="loading">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+              <circle
+                fill="#FF156D"
+                stroke="#FF156D"
+                strokeWidth="15"
+                r="15"
+                cx="35"
+                cy="100"
+              >
+                <animate
+                  attributeName="cx"
+                  calcMode="spline"
+                  dur="2"
+                  values="35;165;165;35;35"
+                  keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
+                  repeatCount="indefinite"
+                  begin="0"
+                ></animate>
+              </circle>
+              <circle
+                fill="#FF156D"
+                stroke="#FF156D"
+                strokeWidth="15"
+                opacity=".8"
+                r="15"
+                cx="35"
+                cy="100"
+              >
+                <animate
+                  attributeName="cx"
+                  calcMode="spline"
+                  dur="2"
+                  values="35;165;165;35;35"
+                  keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
+                  repeatCount="indefinite"
+                  begin="0.05"
+                ></animate>
+              </circle>
+              <circle
+                fill="#FF156D"
+                stroke="#FF156D"
+                strokeWidth="15"
+                opacity=".6"
+                r="15"
+                cx="35"
+                cy="100"
+              >
+                <animate
+                  attributeName="cx"
+                  calcMode="spline"
+                  dur="2"
+                  values="35;165;165;35;35"
+                  keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
+                  repeatCount="indefinite"
+                  begin=".1"
+                ></animate>
+              </circle>
+              <circle
+                fill="#FF156D"
+                stroke="#FF156D"
+                strokeWidth="15"
+                opacity=".4"
+                r="15"
+                cx="35"
+                cy="100"
+              >
+                <animate
+                  attributeName="cx"
+                  calcMode="spline"
+                  dur="2"
+                  values="35;165;165;35;35"
+                  keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
+                  repeatCount="indefinite"
+                  begin=".15"
+                ></animate>
+              </circle>
+              <circle
+                fill="#FF156D"
+                stroke="#FF156D"
+                strokeWidth="15"
+                opacity=".2"
+                r="15"
+                cx="35"
+                cy="100"
+              >
+                <animate
+                  attributeName="cx"
+                  calcMode="spline"
+                  dur="2"
+                  values="35;165;165;35;35"
+                  keySplines="0 .1 .5 1;0 .1 .5 1;0 .1 .5 1;0 .1 .5 1"
+                  repeatCount="indefinite"
+                  begin=".2"
+                ></animate>
+              </circle>
+            </svg>
+          </div>
+        )}
+      </div>
+    );
   }
 
   if (loading || !data) {

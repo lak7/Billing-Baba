@@ -4,45 +4,110 @@ import { useNavigate } from "react-router-dom";
 import ImageUploader from "../components/ImgUpload";
 import { data } from "autoprefixer";
 
-export default function Profile({ data, setData }) {
+export default function Profile({ data, setData, change, setChange }) {
   const Navigate = useNavigate();
 
   const [ProfileDat, setProfileDat] = useState({
-    BusinessName: data.BusinessName,
-    GSTIN: data.GSTIN,
-    email: data.email,
-    mobile: data.mobile,
-    name: data.name,
-    address: data.address,
-    address2: data.address2,
-    pincode: data.pincode,
-    State: data.State,
-    City: data.City,
-    establishedYear: data.establishedYear,
+    BusinessName: data.BusinessName || "",
+    GSTIN: data.GSTIN || "",
+    email: data.email || "",
+    mobile: data.mobile || "",
+    name: data.name || "",
+    address: data.address || "",
+    address2: data.address2 || "",
+    pincode: data.pincode || "",
+    State: data.State || "",
+    City: data.City || "",
+    establishedYear: data.establishedYear || "",
   });
 
   const [gstType, setGstType] = useState("withGST");
-
   const [page, setPage] = useState(0);
 
-  var [Logo, setLogo] = useState();
-  var [Signature, setSignature] = useState();
+  // Initialize logo and signature from data
+  const [Logo, setLogo] = useState(data.Logo || null);
+  const [Signature, setSignature] = useState(data.Signature || null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showLogoPopup, setShowLogoPopup] = useState(false);
 
+  // Update values when data changes externally
+  useEffect(() => {
+    setLogo(data.Logo || null);
+    setSignature(data.Signature || null);
+    setProfileDat({
+      BusinessName: data.BusinessName || "",
+      GSTIN: data.GSTIN || "",
+      email: data.email || "",
+      mobile: data.mobile || "",
+      name: data.name || "",
+      address: data.address || "",
+      address2: data.address2 || "",
+      pincode: data.pincode || "",
+      State: data.State || "",
+      City: data.City || "",
+      establishedYear: data.establishedYear || "",
+    });
+  }, [data]);
+
+  // Update logo and save to data
   const handleUploadProfileImage = (url) => {
+    console.log("Logo URL received:", url);
     setLogo(url);
+    const updatedData = { ...data, Logo: url };
+    setData(updatedData);
+    // Trigger update to localStorage if change state exists
+    if (setChange) {
+      setChange(!change);
+    }
   };
 
+  // Update signature and save to data
   const handleUploadSign = (url) => {
+    console.log("Signature URL received:", url);
     setSignature(url);
+    const updatedData = { ...data, Signature: url };
+    setData(updatedData);
+    // Trigger update to localStorage if change state exists
+    if (setChange) {
+      setChange(!change);
+    }
   };
 
-  //useEffect(()=>{
-  //setTimeout(() => {
-  ///setData({ ...data, Companies: null });
-  //}, 3000);
-  //setData({ ...data, Companies: null});
-  //},[])
+  // Clear logo
+  const handleClearLogo = () => {
+    setLogo(null);
+    const updatedData = { ...data, Logo: null };
+    setData(updatedData);
+    if (setChange) {
+      setChange(!change);
+    }
+  };
+
+  // Clear signature
+  const handleClearSignature = () => {
+    setSignature(null);
+    const updatedData = { ...data, Signature: null };
+    setData(updatedData);
+    if (setChange) {
+      setChange(!change);
+    }
+  };
+
+  // Handle save company data
+  const handleSaveCompany = () => {
+    const updatedData = {
+      ...data,
+      ...ProfileDat,
+      Logo: Logo,
+      Signature: Signature,
+    };
+    console.log("Saving company data:", updatedData);
+    setData(updatedData);
+    if (setChange) {
+      setChange(!change);
+    }
+    alert("Company data saved successfully");
+  };
 
   const createnewCompany = (Company) => {
     if (data.Companies) {
@@ -55,6 +120,9 @@ export default function Profile({ data, setData }) {
           currentCompanyIndex: lastIndex + 1,
         };
         setData({ ...data, Companies: [...data.Companies, newCompany] });
+        if (setChange) {
+          setChange(!change);
+        }
       }
     } else {
       console.log(data);
@@ -72,6 +140,9 @@ export default function Profile({ data, setData }) {
         currentCompanyIndex: 1,
       };
       setData({ ...data, Companies: [currentCompany, newCompany] });
+      if (setChange) {
+        setChange(!change);
+      }
     }
   };
 
@@ -88,20 +159,22 @@ export default function Profile({ data, setData }) {
     <div className="w-full h-full flex flex-col items-center">
       <div className="flex w-full justify-evenly gap-2 bg-[#f9f8f2]">
         <button
-          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${page === 0 && "border-b-2"} `}
+          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${
+            page === 0 && "border-b-2"
+          } `}
           onClick={() => {
             setProfileDat({
-              BusinessName: data.BusinessName,
-              GSTIN: data.GSTIN,
-              email: data.email,
-              mobile: data.mobile,
-              name: data.name,
-              address: data.address,
-              address2: data.address2,
-              pincode: data.pincode,
-              State: data.State,
-              City: data.City,
-              establishedYear: data.establishedYear,
+              BusinessName: data.BusinessName || "",
+              GSTIN: data.GSTIN || "",
+              email: data.email || "",
+              mobile: data.mobile || "",
+              name: data.name || "",
+              address: data.address || "",
+              address2: data.address2 || "",
+              pincode: data.pincode || "",
+              State: data.State || "",
+              City: data.City || "",
+              establishedYear: data.establishedYear || "",
             });
             setPage(0);
           }}
@@ -109,27 +182,35 @@ export default function Profile({ data, setData }) {
           Current Company
         </button>
         {data.settings?.multifirm && (
-        <button
-          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${(page == 1 || page == 5) && "border-b-2"} `}
-          onClick={() => setPage(1)}
-        >
-          Manage Companies
-        </button>
+          <button
+            className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${
+              (page == 1 || page == 5) && "border-b-2"
+            } `}
+            onClick={() => setPage(1)}
+          >
+            Manage Companies
+          </button>
         )}
         <button
-          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500  ${page === 2 && "border-b-2"} `}
+          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500  ${
+            page === 2 && "border-b-2"
+          } `}
           onClick={() => setPage(2)}
         >
           Billing & Plans
         </button>
         <button
-          className={` py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${page === 3 && "border-b-2"} `}
+          className={` py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500 ${
+            page === 3 && "border-b-2"
+          } `}
           disabled
         >
           User & Permissions
         </button>
         <button
-          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500  ${page === 4 && "border-b-2"} `}
+          className={`py-1 px-3 text-md font-semibold hover:bg-gray-300 border-red-500  ${
+            page === 4 && "border-b-2"
+          } `}
           disabled
         >
           My Staff
@@ -139,8 +220,8 @@ export default function Profile({ data, setData }) {
         {page === 0 && (
           <div className="w-full mt-1 mx-auto p-6 bg-white rounded-md">
             <div className="flex justify-between items-center mb-5 w-full">
-            <h1 className="text-xl font-bold">User Profile</h1>
-            <button
+              <h1 className="text-xl font-bold">User Profile</h1>
+              <button
                 className="px-4 py-1 bg-red-500 text-white rounded-sm font-semibold"
                 onClick={() => {
                   logout();
@@ -157,7 +238,9 @@ export default function Profile({ data, setData }) {
                   <>
                     <button
                       className="text-blue-400 font-semibold mx-2 items-center fill-blue-400 flex gap-1"
-                      onClick={() => setShowPopup(true)}
+                      onClick={() => {
+                        setShowLogoPopup(true);
+                      }}
                     >
                       <span className="hover:underline">Add Business Logo</span>{" "}
                       <svg
@@ -168,9 +251,9 @@ export default function Profile({ data, setData }) {
                         <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
                       </svg>
                     </button>
-                    {showPopup && (
+                    {showLogoPopup && (
                       <ImageUploader
-                        onClose={() => setShowPopup(false)}
+                        onClose={() => setShowLogoPopup(false)}
                         onUpload={handleUploadProfileImage}
                       />
                     )}
@@ -185,7 +268,7 @@ export default function Profile({ data, setData }) {
                       />
                       <button
                         className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
-                        onClick={() => setLogo()}
+                        onClick={handleClearLogo}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -202,71 +285,77 @@ export default function Profile({ data, setData }) {
                     <span>Business Logo</span>
                   </>
                 )}
-                {/*<p>{Signature}</p>
-          <p>{Logo}</p>*/}
               </div>
               <div className="">
-              {!Signature ? (
-                <>
-                  <button
-                    className="text-blue-400 font-semibold mx-2 items-center fill-blue-400 flex gap-1"
-                    onClick={() => setShowPopup(true)}
-                  >
-                    <span className="hover:underline">Add Business Sign</span>{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 448 512"
-                      className="w-4 h-4"
-                    >
-                      <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
-                    </svg>
-                  </button>
-                  {showPopup && (
-                    <ImageUploader
-                      onClose={() => setShowPopup(false)}
-                      onUpload={handleUploadSign}
-                    />
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden relative my-2">
-                    <img
-                      src={Signature}
-                      alt="Sign"
-                      className="w-full h-full object-cover"
-                    />
+                {!Signature ? (
+                  <>
                     <button
-                      className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
-                      onClick={() => setSignature()}
+                      className="text-blue-400 font-semibold mx-2 items-center fill-blue-400 flex gap-1"
+                      onClick={() => setShowPopup(true)}
                     >
+                      <span className="hover:underline">Add Business Sign</span>{" "}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 448 512"
                         className="w-4 h-4"
                       >
-                        <path
-                          d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H160 85.9l11.1-11.6c9.4-10.5 9.4-27.7 0-39.2L
-                  135.2 17.7zM32 128H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32S14.3 32 32 32z"
-                        />
+                        <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
                       </svg>
                     </button>
-                  </div>
-                  <span>Business Sign</span>
-                </>
-              )}
-            </div>
+                    {showPopup && (
+                      <ImageUploader
+                        onClose={() => setShowPopup(false)}
+                        onUpload={handleUploadSign}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden relative my-2">
+                      <img
+                        src={Signature}
+                        alt="Sign"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                        onClick={handleClearSignature}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 448 512"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H160 85.9l11.1-11.6c9.4-10.5 9.4-27.7 0-39.2L
+                  135.2 17.7zM32 128H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32S14.3 32 32 32z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <span>Business Sign</span>
+                  </>
+                )}
+              </div>
             </div>
             <div className="flex space-x-4 mb-4">
               <button
                 onClick={() => setGstType("withGST")}
-                className={`flex-1 p-2 rounded-md ${gstType === "withGST" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}`}
+                className={`flex-1 p-2 rounded-md ${
+                  gstType === "withGST"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-600"
+                }`}
               >
                 With GST
               </button>
               <button
                 onClick={() => setGstType("nonGST")}
-                className={`flex-1 p-2 rounded-md ${gstType === "nonGST" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}`}
+                className={`flex-1 p-2 rounded-md ${
+                  gstType === "nonGST"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-600"
+                }`}
               >
                 Non-GST
               </button>
@@ -525,24 +614,11 @@ export default function Profile({ data, setData }) {
                       }
                     />
                   </div>
-
-                  {/*<div>
-                  <label className="block text-gray-700 font-semibold">
-                    Registration Type
-                  </label>
-                  <input
-                    autoComplete="off"
-                    type="text"
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                    placeholder="Type"
-                  />
-                </div>*/}
                 </div>
               </div>
             )}
             {gstType === "nonGST" && (
               <div>
-                {/* Non-GST form fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-gray-700 font-semibold">
@@ -775,27 +851,13 @@ export default function Profile({ data, setData }) {
                       }
                     />
                   </div>
-                  <div>
-                    <label className="block text-gray-700 font-semibold">
-                      Registration Type
-                    </label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md">
-                      <option>With GST</option>
-                      <option>Without GST</option>
-
-                    </select>
-                  </div>
                 </div>
               </div>
             )}
             <div className="flex justify-between mt-4">
-              
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                onClick={() => {
-                  console.log(ProfileDat);
-                  setData({ ...data, ...ProfileDat });
-                }}
+                onClick={handleSaveCompany}
               >
                 Save Company
               </button>
@@ -854,7 +916,7 @@ export default function Profile({ data, setData }) {
                   <>
                     <button
                       className="text-blue-400 font-semibold mx-2 items-center fill-blue-400 flex gap-1"
-                      onClick={() => setShowPopup(true)}
+                      onClick={() => setShowLogoPopup(true)}
                     >
                       <span className="hover:underline">Add Business Logo</span>{" "}
                       <svg
@@ -865,9 +927,9 @@ export default function Profile({ data, setData }) {
                         <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
                       </svg>
                     </button>
-                    {showPopup && (
+                    {showLogoPopup && (
                       <ImageUploader
-                        onClose={() => setShowPopup(false)}
+                        onClose={() => setShowLogoPopup(false)}
                         onUpload={handleUploadProfileImage}
                       />
                     )}
@@ -882,7 +944,58 @@ export default function Profile({ data, setData }) {
                       />
                       <button
                         className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
-                        onClick={() => setLogo()}
+                        onClick={handleClearLogo}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 448 512"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H160 85.9l11.1-11.6c9.4-10.5 9.4-27.7 0-39.2L
+                    135.2 17.7zM32 128H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32S14.3 32 32 32z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <span>Business Logo</span>
+                  </>
+                )}
+              </div>
+              <div className="mb-2">
+                {!Signature ? (
+                  <>
+                    <button
+                      className="text-blue-400 font-semibold mx-2 items-center fill-blue-400 flex gap-1"
+                      onClick={() => setShowPopup(true)}
+                    >
+                      <span className="hover:underline">Add Business Sign</span>{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 448 512"
+                        className="w-4 h-4"
+                      >
+                        <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+                      </svg>
+                    </button>
+                    {showPopup && (
+                      <ImageUploader
+                        onClose={() => setShowPopup(false)}
+                        onUpload={handleUploadSign}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden relative my-2">
+                      <img
+                        src={Signature}
+                        alt="Sign"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                        onClick={handleClearSignature}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -896,7 +1009,7 @@ export default function Profile({ data, setData }) {
                         </svg>
                       </button>
                     </div>
-                    <span>Business Logo</span>
+                    <span>Business Sign</span>
                   </>
                 )}
               </div>
@@ -904,13 +1017,21 @@ export default function Profile({ data, setData }) {
             <div className="flex space-x-4 mb-4">
               <button
                 onClick={() => setGstType("withGST")}
-                className={`flex-1 p-2 rounded-md ${gstType === "withGST" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}`}
+                className={`flex-1 p-2 rounded-md ${
+                  gstType === "withGST"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-600"
+                }`}
               >
                 With GST
               </button>
               <button
                 onClick={() => setGstType("nonGST")}
-                className={`flex-1 p-2 rounded-md ${gstType === "nonGST" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}`}
+                className={`flex-1 p-2 rounded-md ${
+                  gstType === "nonGST"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-600"
+                }`}
               >
                 Non-GST
               </button>
@@ -1039,16 +1160,16 @@ export default function Profile({ data, setData }) {
                   </div>
 
                   <div>
-                    <label
-                      className="block text-gray-700 font-semibold"
+                    <label className="block text-gray-700 font-semibold">
+                      State
+                    </label>
+                    <select
+                      className="w-full p-2 border border-gray-300 rounded-md"
                       value={ProfileDat.State}
                       onChange={(e) =>
                         setProfileDat({ ...ProfileDat, State: e.target.value })
                       }
                     >
-                      State
-                    </label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md">
                       <option value="">Select State/UT</option>
                       <optgroup label="States">
                         <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -1433,7 +1554,14 @@ export default function Profile({ data, setData }) {
               </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                onClick={() => createnewCompany(ProfileDat)}
+                onClick={() => {
+                  const newCompanyData = {
+                    ...ProfileDat,
+                    Logo: Logo,
+                    Signature: Signature,
+                  };
+                  createnewCompany(newCompanyData);
+                }}
               >
                 Create Company
               </button>
